@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dreams Cafe | Where dreams brew and flavours bloom</title>
+    <!-- Tailwind CSS for modern styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --espresso: #2D2424;
+            --latte: #A67C52;
+            --cream: #F8F5F2;
+            --warm-bg: #FAF7F2;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--warm-bg);
+            color: var(--espresso);
+        }
+
+        h1, h2, h3, .font-serif {
+            font-family: 'Playfair Display', serif;
+        }
+
+        /* --- TRANSPARENT NAV LOGIC --- */
+        .sticky-nav {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            background-color: transparent;
+            border-color: transparent;
+        }
+
+        /* Classes applied when scrolling */
+        .sticky-nav.scrolled {
+            backdrop-filter: blur(12px);
+            background-color: rgba(255, 255, 255, 0.8);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            height: 70px; /* Shrink slightly on scroll */
+        }
+
+        .nav-text {
+            transition: color 0.4s ease;
+            color: white; /* Default for hero overlay */
+        }
+
+        .sticky-nav.scrolled .nav-text {
+            color: var(--espresso);
+        }
+
+        .sticky-nav.scrolled .nav-link:hover {
+            color: var(--latte);
+        }
+
+        /* --- BACKGROUND IMAGE --- */
+        .hero-gradient {
+            background: linear-gradient(rgba(45, 36, 36, 0.6), rgba(45, 36, 36, 0.4)), 
+                        url('1.png');
+            background-size: cover;
+            background-position: center;
+        }
+
+        .btn-primary {
+            background-color: var(--latte);
+            color: white;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--espresso);
+            transform: scale(1.05);
+        }
+
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .gallery-img {
+            aspect-ratio: 1/1;
+            object-fit: cover;
+            border-radius: 12px;
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            border: 1px solid rgba(0,0,0,0.05);
+            cursor: pointer;
+        }
+
+        .gallery-img:hover {
+            transform: scale(1.02);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+
+        /* Container for the Logo */
+        .logo-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--latte);
+            border-radius: 50%;
+            overflow: hidden;
+        }
+
+        /* Enhanced Slider Styles */
+        .review-slide {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.6s ease-in-out;
+        }
+        .review-slide.active {
+            display: block;
+            opacity: 1;
+            animation: slideUpFade 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        
+        @keyframes slideUpFade {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .review-card {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(166, 124, 82, 0.1);
+        }
+
+        /* Lightbox Styles */
+        #lightbox {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 100;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            backdrop-filter: blur(5px);
+        }
+        #lightbox.active {
+            display: flex;
+        }
+        .lightbox-content {
+            max-width: 90%;
+            max-height: 80vh;
+            border-radius: 8px;
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+            object-fit: contain;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header / Navbar -->
+    <nav id="navbar" class="fixed top-0 w-full z-50 sticky-nav">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between transition-all duration-300" id="nav-inner">
+            <div class="flex items-center gap-3">
+                <div class="logo-container w-10 h-10">
+                    <img src="bro_bro.png" alt="Logo" class="w-full h-full object-cover">
+                </div>
+                <span class="text-2xl font-serif font-bold tracking-tight nav-text">Dreams Cafe</span>
+            </div>
+            
+            <div class="hidden md:flex gap-8 items-center text-sm font-medium uppercase tracking-widest nav-text">
+                <a href="#home" class="nav-link hover:opacity-70 transition-all">Home</a>
+                <a href="#about" class="nav-link hover:opacity-70 transition-all">About</a>
+                <a href="#gallery" class="nav-link hover:opacity-70 transition-all">Gallery</a>
+                <a href="#contact" class="nav-link hover:opacity-70 transition-all">Contact</a>
+            </div>
+
+            <button class="md:hidden p-2" id="mobile-menu-btn">
+                <div class="w-6 h-0.5 bg-current mb-1 nav-text"></div>
+                <div class="w-6 h-0.5 bg-current mb-1 nav-text"></div>
+                <div class="w-6 h-0.5 bg-current nav-text"></div>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="fixed inset-0 bg-white z-[60] flex flex-col items-center justify-center gap-8 text-2xl font-serif hidden">
+        <button class="absolute top-6 right-6 text-4xl" id="close-menu">&times;</button>
+        <div class="logo-container w-20 h-20">
+            <img src="bro_bro.png" alt="Logo" class="w-full h-full object-cover">
+        </div>
+        <a href="#home" class="mobile-link text-stone-800">Home</a>
+        <a href="#about" class="mobile-link text-stone-800">About</a>
+        <a href="#gallery" class="mobile-link text-stone-800">Gallery</a>
+        <a href="#contact" class="mobile-link text-stone-800">Contact</a>
+    </div>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero-gradient h-screen flex items-center justify-center text-center text-white px-6">
+        <div class="max-w-3xl fade-in flex flex-col items-center" id="hero-content">
+            <div class="w-24 h-24 mb-6 rounded-full overflow-hidden bg-white/20 backdrop-blur-md border border-white/30 p-1">
+                <img src="bro_bro.png" alt="Dreams Cafe Logo" class="w-full h-full rounded-full object-cover">
+            </div>
+            <h1 class="text-5xl md:text-7xl font-bold mb-4">Dreams Cafe</h1>
+            <p class="text-xl md:text-2xl font-light italic mb-8 opacity-90">Where dreams brew and flavours bloom ☁️✨</p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center w-full">
+                <a href="#contact" class="btn-primary px-10 py-4 rounded-full font-semibold uppercase tracking-wider text-sm shadow-lg">
+                    Visit Us
+                </a>
+                <a href="#gallery" class="bg-white/10 backdrop-blur-md border border-white/30 hover:bg-white hover:text-[#2D2424] px-10 py-4 rounded-full font-semibold uppercase tracking-wider text-sm transition-all">
+                    Gallery
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="py-24 px-6 bg-white overflow-hidden">
+        <div class="max-w-6xl mx-auto grid lg:grid-cols-2 gap-16 items-start">
+            <div class="fade-in">
+                <span class="text-[#A67C52] uppercase tracking-[0.2em] text-xs font-bold block mb-4">The Experience</span>
+                <h2 class="text-4xl md:text-5xl font-serif mb-6 leading-tight">Crafting moments of tranquility</h2>
+                <p class="text-stone-600 leading-relaxed mb-6">
+                    Dreams Cafe was born out of a simple desire: to create a sanctuary where the aroma of freshly roasted beans meets a peaceful, modern atmosphere.
+                </p>
+                
+                <!-- Enhanced Reviews Slider -->
+                <div class="relative group">
+                    <button onclick="changeReview(-1)" class="absolute -left-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-white shadow-md flex items-center justify-center hover:bg-stone-900 hover:text-white transition-all border border-stone-100 opacity-0 group-hover:opacity-100 lg:-left-6">
+                        <span class="text-sm">←</span>
+                    </button>
+
+                    <div class="review-card p-10 rounded-3xl shadow-sm relative overflow-hidden">
+                        <div class="text-amber-400 flex gap-1 mb-6 justify-center">
+                            <span>★</span><span>★</span><span>★</span><span>★</span><span>★</span>
+                        </div>
+                        
+                        <div id="review-container" class="relative text-center min-h-[160px] flex items-center">
+                            <div class="review-slide active w-full">
+                                <p class="text-stone-700 italic leading-relaxed mb-6 text-base md:text-lg px-4">
+                                    "Dreams Café is a cozy place with a warm vibe and stylish ambience — perfect for catching up with friends. The coffee is smooth, especially their cappuccino and cold brews."
+                                </p>
+                                <h4 class="font-bold text-stone-900 tracking-tight text-lg">Amman Singh</h4>
+                            </div>
+                            <div class="review-slide w-full">
+                                <p class="text-stone-700 italic leading-relaxed mb-6 text-base md:text-lg px-4">
+                                    "Recommended by a friend and it's easily become a favourite. Peaceful ambience with plug points for a work-from-cafe vibe. Sunset daiquiri is a must-try for coffee lovers!"
+                                </p>
+                                <h4 class="font-bold text-stone-900 tracking-tight text-lg">V. Niharika</h4>
+                            </div>
+                            <div class="review-slide w-full">
+                                <p class="text-stone-700 italic leading-relaxed mb-6 text-base md:text-lg px-4">
+                                    "'Stunning' is the perfect word. Captivated by the cosy and pretty ambiance. The food? Absolutely phenomenal! Bursting with flavors and beautifully presented. A solid 10/10!"
+                                </p>
+                                <h4 class="font-bold text-stone-900 tracking-tight text-lg">Vaishnavi Vyas</h4>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-center gap-2 mt-8" id="slider-dots">
+                            <span class="w-1.5 h-1.5 rounded-full bg-[#A67C52] transition-all"></span>
+                            <span class="w-1.5 h-1.5 rounded-full bg-stone-200 transition-all"></span>
+                            <span class="w-1.5 h-1.5 rounded-full bg-stone-200 transition-all"></span>
+                        </div>
+                    </div>
+
+                    <button onclick="changeReview(1)" class="absolute -right-4 top-1/2 -translate-y-1/2 z-10 w-10 h-10 rounded-full bg-white shadow-md flex items-center justify-center hover:bg-stone-900 hover:text-white transition-all border border-stone-100 opacity-0 group-hover:opacity-100 lg:-right-6">
+                        <span class="text-sm">→</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="relative fade-in mt-12 lg:mt-0">
+                <div class="absolute -top-10 -right-10 w-64 h-64 bg-[#A67C52] opacity-10 rounded-full blur-3xl -z-10"></div>
+                <img src="6.png" alt="Cafe Interior" class="rounded-[2.5rem] shadow-2xl object-cover aspect-[4/5] w-full">
+                <div class="absolute -bottom-6 -left-6 bg-white p-8 rounded-2xl shadow-xl max-w-[200px] border border-stone-100">
+                    <p class="text-stone-800 font-serif text-lg italic leading-tight">"Where flavors meet magic."</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gallery Section -->
+    <section id="gallery" class="py-24 px-6 bg-white">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-16 fade-in">
+                <h2 class="text-4xl font-serif mb-4">Ambiance</h2>
+                <p class="text-stone-500">Take a peek into our cozy corners (Click to enlarge)</p>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4" id="gallery-grid">
+                <img src="2.png" alt="Cafe view 1" class="gallery-img fade-in" onclick="openLightbox(0)">
+                <img src="3.png" alt="Cafe view 2" class="gallery-img fade-in" onclick="openLightbox(1)">
+                <img src="4.png" alt="Cafe view 3" class="gallery-img fade-in" onclick="openLightbox(2)">
+                <img src="5.png" alt="Cafe view 4" class="gallery-img fade-in" onclick="openLightbox(3)">
+            </div>
+        </div>
+    </section>
+
+    <!-- Lightbox Element -->
+    <div id="lightbox">
+        <button onclick="closeLightbox()" class="absolute top-6 right-6 text-white text-5xl hover:text-stone-300 z-50">&times;</button>
+        <button onclick="changeGalleryImage(-1)" class="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center text-2xl transition-all border border-white/20">←</button>
+        <img id="lightbox-img" src="" alt="Enlarged view" class="lightbox-content">
+        <button onclick="changeGalleryImage(1)" class="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center text-2xl transition-all border border-white/20">→</button>
+        <p id="lightbox-caption" class="text-white mt-6 font-serif italic text-lg opacity-80"></p>
+    </div>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-24 px-6 bg-stone-100">
+        <div class="max-w-6xl mx-auto">
+            <div class="grid md:grid-cols-2 gap-16">
+                <div class="fade-in">
+                    <h2 class="text-4xl font-serif mb-8">Visit Us</h2>
+                    <div class="space-y-6">
+                        <div class="flex items-start gap-4">
+                            <span class="text-[#A67C52] shrink-0 text-xl">📍</span>
+                            <p class="text-stone-700 text-sm md:text-base">
+                                Ground Floor, The Pinnacle, Lumbini Avenue,<br>
+                                Gachibowli, Hyderabad, Telangana 500032
+                            </p>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <span class="text-[#A67C52] shrink-0 text-xl">📞</span>
+                            <p class="text-stone-700 font-bold">83410 34454</p>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <span class="text-[#A67C52] shrink-0 text-xl">📅</span>
+                            <p class="text-stone-700">Book a table via <a href="https://www.eazydiner.com/hyderabad/dreams-cafe-gachibowli-hyderabad-699486" target="_blank" class="text-[#A67C52] font-semibold hover:underline">EazyDiner</a></p>
+                        </div>
+                        <div class="pt-6 border-t border-stone-200">
+                            <h4 class="font-bold mb-4 uppercase text-[10px] tracking-[0.2em] text-stone-400">Order Online</h4>
+                            <p class="text-stone-700 text-sm">
+                                Find us on <a href="https://www.zomato.com/hyderabad/dreams-cafe-gachibowli" target="_blank" class="text-[#A67C52] font-semibold hover:underline">Zomato</a>
+                            </p>
+                        </div>
+                        <div class="pt-6 border-t border-stone-200">
+                            <h4 class="font-bold mb-2 uppercase text-[10px] tracking-[0.2em] text-stone-400">Opening Hours</h4>
+                            <p class="text-stone-700 text-sm md:text-base">Daily: 9:00 AM - 11:00 PM</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="fade-in">
+                    <div class="bg-white p-2 rounded-3xl shadow-lg h-[400px] w-full overflow-hidden border border-white">
+                        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3806.2736173453896!2d78.3697962!3d17.4465492!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bcb93f3e1b7f007%3A0x633d1c1c1f1c1f1c!2sThe%20Pinnacle!5e0!3m2!1sen!2sin!4v1620000000000!5m2!1sen!2sin" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-[#2D2424] text-white py-16 px-6 text-center">
+        <div class="max-w-7xl mx-auto flex flex-col items-center gap-6 border-b border-white/5 pb-12 mb-8">
+            <div class="logo-container w-14 h-14">
+                <img src="bro_bro.png" alt="Logo" class="w-full h-full object-cover">
+            </div>
+            <span class="text-3xl font-serif font-bold tracking-tight">Dreams Cafe</span>
+            <p class="text-white/40 text-sm max-w-sm">"Where dreams brew and flavours bloom"</p>
+        </div>
+        <div class="text-[10px] uppercase tracking-widest text-white/20">
+            <p>&copy; 2024 Dreams Cafe. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Transparent Navbar Scroll Logic
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Reviews Slider Logic
+        let currentReviewIndex = 0;
+        const slides = document.querySelectorAll('.review-slide');
+        const dots = document.querySelectorAll('#slider-dots span');
+
+        function updateDots() {
+            dots.forEach((dot, index) => {
+                if (index === currentReviewIndex) {
+                    dot.classList.add('bg-[#A67C52]', 'w-4');
+                    dot.classList.remove('bg-stone-200', 'w-1.5');
+                } else {
+                    dot.classList.add('bg-stone-200', 'w-1.5');
+                    dot.classList.remove('bg-[#A67C52]', 'w-4');
+                }
+            });
+        }
+
+        function changeReview(direction) {
+            slides[currentReviewIndex].classList.remove('active');
+            currentReviewIndex = (currentReviewIndex + direction + slides.length) % slides.length;
+            slides[currentReviewIndex].classList.add('active');
+            updateDots();
+        }
+
+        // Gallery Lightbox Logic
+        const galleryImages = [
+            { src: '2.png', alt: 'Cafe view 1' },
+            { src: '3.png', alt: 'Cafe view 2' },
+            { src: '4.png', alt: 'Cafe view 3' },
+            { src: '5.png', alt: 'Cafe view 4' }
+        ];
+        let currentGalleryIndex = 0;
+
+        function openLightbox(index) {
+            currentGalleryIndex = index;
+            const lightbox = document.getElementById('lightbox');
+            const img = document.getElementById('lightbox-img');
+            const caption = document.getElementById('lightbox-caption');
+            img.src = galleryImages[index].src;
+            caption.innerText = galleryImages[index].alt;
+            lightbox.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeLightbox() {
+            document.getElementById('lightbox').classList.remove('active');
+            document.body.style.overflow = 'auto';
+        }
+
+        function changeGalleryImage(direction) {
+            currentGalleryIndex = (currentGalleryIndex + direction + galleryImages.length) % galleryImages.length;
+            const img = document.getElementById('lightbox-img');
+            const caption = document.getElementById('lightbox-caption');
+            img.src = galleryImages[currentGalleryIndex].src;
+            caption.innerText = galleryImages[currentGalleryIndex].alt;
+        }
+
+        document.getElementById('lightbox').addEventListener('click', (e) => {
+            if (e.target.id === 'lightbox') closeLightbox();
+        });
+
+        window.addEventListener('DOMContentLoaded', () => {
+            const observerOptions = { threshold: 0.1 };
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+            const mobileBtn = document.getElementById('mobile-menu-btn');
+            const closeBtn = document.getElementById('close-menu');
+            const mobileMenu = document.getElementById('mobile-menu');
+
+            mobileBtn.onclick = () => mobileMenu.classList.remove('hidden');
+            closeBtn.onclick = () => mobileMenu.classList.add('hidden');
+            document.querySelectorAll('.mobile-link').forEach(link => {
+                link.onclick = () => mobileMenu.classList.add('hidden');
+            });
+
+            setInterval(() => changeReview(1), 8000);
+            updateDots();
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (!document.getElementById('lightbox').classList.contains('active')) return;
+            if (e.key === 'ArrowLeft') changeGalleryImage(-1);
+            if (e.key === 'ArrowRight') changeGalleryImage(1);
+            if (e.key === 'Escape') closeLightbox();
+        });
+    </script>
+</body>
+</html>
